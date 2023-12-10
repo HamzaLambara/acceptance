@@ -22,6 +22,8 @@ pipeline {
 
         stage("Déploiement sur staging") {
             steps {
+                sh 'docker stop calculator || true'  // Arrête le conteneur s'il est en cours d'exécution (ou ignore l'erreur s'il n'existe pas)
+                sh 'docker rm -f calculator || true'  // Supprime le conteneur s'il existe déjà (ou ignore l'erreur s'il n'existe pas)
                 sh "docker run -d --rm -p 8765:8080 --name calculator localhost:5000/calculator"
             }
         }
