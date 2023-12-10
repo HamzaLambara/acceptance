@@ -1,45 +1,60 @@
 pipeline {
     agent any
-    
+
     stages {
-        stage("Package") {
+        stage('Checkout SCM') {
             steps {
-                sh "./gradlew build"
-            }
-        }
-        
-        stage("Docker build") {
-            steps {
-                sh "docker build -t calculator ."
+                checkout scm
             }
         }
 
-        stage("Docker push") {
+        stage('Package') {
             steps {
-                sh "docker push localhost:5000/calculator"
+                sh './gradlew build'
             }
         }
 
-        stage("Déploiement sur staging") {
+        stage('Docker build') {
             steps {
-                sh 'docker stop calculator || true'  // Arrête le conteneur s'il est en cours d'exécution (ou ignore l'erreur s'il n'existe pas)
-                sh 'docker rm -f calculator || true'  // Supprime le conteneur s'il existe déjà (ou ignore l'erreur s'il n'existe pas)
-                sh "docker run -d --rm -p 8765:8080 --name calculator localhost:5000/calculator"
+                sh 'docker build -t calculator .'
             }
         }
 
-        stage("Test d'acceptation") {
+        stage('Docker push') {
             steps {
-                sleep 60  // Ajoutez un délai de 60 secondes pour permettre au conteneur de démarrer
-                sh "chmod +x acceptance_test.sh && ./acceptance_test.sh"
+                sh 'docker push localhost:5000/calculator'
+            }
+        }
+
+        stage('Déploiement sur staging') {
+            steps {
+                sh '''
+                    docker ps -a | grep calculator && docker stop calculator || true
+                    docker rm -f calculator || true
+                    docker run -d --rm -p 8765:8080 --name calculator localhost:5000/calculator
+                '''
+            }
+        }
+
+        stage('Test d\'acceptation') {
+            steps {
+                script {
+                    // Ajoutez une temporisation pour attendre que l'application soit disponible
+                    sleep time: 2, unit: 'MINUTES'
+                    sh 'chmod +x acceptance_test.sh && ./acceptance_test.sh'
+                }
             }
         }
     }
-    
+
     post {
         always {
-            sh "docker stop calculator"
+            sh '''
+                docker ps -a | grep calculator && docker stop calculator || true
+                docker rm -f calculator || true
+            '''
         }
     }
 }
+
 
