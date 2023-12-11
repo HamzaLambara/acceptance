@@ -25,8 +25,7 @@ pipeline {
         stage('Docker push') {
             steps {
                 script {
-                    docker.withRegistry('http://localhost:5000', 'docker-registry-credentials-id') {
-                        docker.image('calculator').push()
+                    docker push localhost:5000/calculator
                     }
                 }
             }
