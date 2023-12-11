@@ -1,2 +1,9 @@
 #!/bin/bash
-test $(curl localhost:8888/sum?a=80\&b=20) -eq 100
+response=$(curl localhost:8888/sum?a=80\&b=20)
+if [ $? -ne 0 ]; then
+    echo "Failed to connect to service"
+    exit 1
+fi
+
+test $response -eq 100
+
