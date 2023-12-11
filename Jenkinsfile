@@ -22,8 +22,7 @@ pipeline {
         
         stage("Déploiement sur staging") {
             steps {
-                sh "docker stop calculator || true"
-                sh "docker rm calculator || true"
+
                 sh "docker run -d -p 8765:8080 --name calculator localhost:5000/calculator"
             }
         }
