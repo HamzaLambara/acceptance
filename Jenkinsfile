@@ -1,43 +1,71 @@
 pipeline {
     agent any
-    
+
     stages {
-        stage("Package") {
+        stage('Checkout SCM') {
             steps {
-                sh "./gradlew build"
+                checkout([$class: 'GitSCM', branches: [[name: '*/main']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/HamzaLambara/acceptance.git']]])
             }
         }
-        
-        stage("Docker build") {
+
+        stage('Package') {
             steps {
-                sh "docker build -t calculator ."
+                sh './gradlew build'
             }
         }
-        
-        stage("Docker push") {
+
+        stage('Docker build') {
             steps {
-                sh "docker push localhost:5000/calculator"
+                script {
+                    docker.build('calculator')
+                }
             }
         }
-        
-        stage("Déploiement sur staging") {
+
+        stage('Docker push') {
             steps {
-                sh "docker rm calculator || true"
-                sh "docker run -d -p 8888:8080 --name calculator localhost:5000/calculator"
+                script {
+                    docker.withRegistry('http://localhost:5000', 'docker-registry-credentials-id') {
+                        docker.image('calculator').push()
+                    }
+                }
             }
         }
-        
-        stage("Test d'acceptation") {
+
+        stage('Déploiement sur staging') {
             steps {
-                sleep 60
-                sh "chmod +x acceptance_test.sh && ./acceptance_test.sh"
+                script {
+                    docker.withRegistry('http://localhost:5000', 'docker-registry-credentials-id') {
+                        def calculator = docker.image('calculator').start('-p 8888:8080 --name calculator')
+                    }
+                }
+            }
+        }
+
+        stage('Test d\'acceptation') {
+            steps {
+                sleep(time: 1, unit: 'MINUTES')
+                sh 'chmod +x acceptance_test.sh'
+                sh './acceptance_test.sh http://localhost:8888'
+            }
+        }
+
+        stage('Post Actions') {
+            steps {
+                script {
+                    def calculator = docker.image('calculator')
+                    calculator.stop()
+                }
             }
         }
     }
 
     post {
         always {
-            sh "docker stop calculator"
+            script {
+                docker.image('calculator').remove()
+            }
         }
     }
 }
+
