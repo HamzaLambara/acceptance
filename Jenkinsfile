@@ -33,7 +33,7 @@ pipeline {
                 sh "docker stop calculator"
                 sh "docker rm calculator"
                 sh "docker run -d -p 8765:8080 --name calculator localhost:5000/calculator"
-                //sleep 60
+                sleep 60
                 //sh "chmod +x acceptance_test.sh && ./acceptance_test.sh"
             }
         }
