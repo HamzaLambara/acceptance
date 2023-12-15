@@ -51,5 +51,17 @@ jacocoTestCoverageVerification {
     }
 }
 
+// Ajouter les lignes suivantes pour configurer les tests d'acceptation
+repositories {
+    mavenCentral()
+}
 
+tasks.register('acceptanceTest', Test) {
+    include '**/acceptance/**'
+    systemProperties System.getProperties()
+}
+
+test {
+    exclude '**/acceptance/**'
+}
 
