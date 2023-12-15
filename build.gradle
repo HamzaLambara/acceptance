@@ -52,16 +52,7 @@ jacocoTestCoverageVerification {
 task acceptanceTest(type: Test) {
     description = 'Run acceptance tests'
     group = 'verification'
-
-    // Inclure les dépendances nécessaires pour vos tests d'acceptation
-    classpath += configurations.acceptanceTestCompile
-
-    // Spécifier les classes de test d'acceptation
-    include '**/*AcceptanceTest.*'
-
-    // Paramètres supplémentaires si nécessaire
-    systemProperty 'calculator.url', 'http://localhost:8080'  // Remplacez l'URL par celle de votre application
-
+    
     // Autres configurations de test si nécessaire
     useJUnitPlatform()
 }
