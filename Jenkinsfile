@@ -1,48 +1,57 @@
 pipeline {
     agent any
-    
     stages {
-        stage("Package") {
+        stage('Compilation') {
             steps {
-                sh "./gradlew build"
+                sh './gradlew compileJava'
             }
         }
-        
-        stage("Docker build") {
+        stage('test unitaire') {
             steps {
-                sh "docker build -t calculator ."
+                sh './gradlew test'
             }
         }
-        
-        stage("Docker push") {
+        stage('Code coverage') {
             steps {
-                sh "docker push localhost:5000/calculator"
+                sh './gradlew jacocoTestReport'
+                publishHTML(target: [
+                    reportDir: 'build/reports/jacoco/test/html',
+                    reportFiles: 'index.html',
+                    reportName: 'JaCoCo Report'
+                    ])
+                sh './gradlew jacocoTestCoverageVerification'
             }
         }
-        
-        stage("Déploiement sur staging") {
+        stage('Package') {
             steps {
-                sh "docker stop calculator"
-                sh "docker rm calculator"
-                sh "docker run -d -p 8765:8080 --name calculator localhost:5000/calculator"
+                sh './gradlew build'
             }
         }
-        
+        stage('Docker build') {
+            steps {
+                sh 'docker build -t calculator .'
+            }
+        }
+        stage('Docker push') {
+            steps {
+                sh 'docker push localhost:5000/calculator'
+            }
+        }
+        stage('Déploiement sur staging') {
+            steps {
+                sh 'docker run -d --rm -p 8765:8080 --name calculator localhost:5000/calculator'
+            }
+        }
         stage("Test d'acceptation") {
             steps {
-                sh "docker stop calculator"
-                sh "docker rm calculator"
-                sh "docker run -d -p 8765:8080 --name calculator localhost:5000/calculator"
                 sleep 60
-                //sh "chmod +x acceptance_test.sh && ./acceptance_test.sh"
+                sh './gradlew acceptanceTest -Dcalculator.url=http://localhost:8765'
             }
         }
     }
-
     post {
         always {
-            sh "docker stop calculator"
+            sh 'docker stop calculator'
         }
     }
 }
-
