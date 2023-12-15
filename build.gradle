@@ -1,7 +1,7 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.2.0'
-    id 'io.spring.dependency-management' version '1.1.4'
+    id 'org.springframework.boot' version '2.3.12.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'jacoco'
     id 'checkstyle'
 }
@@ -32,7 +32,7 @@ test {
 }
 
 jacoco {
-    toolVersion = "0.8.7" 
+    toolVersion = "0.8.7"
 }
 
 jacocoTestReport {
@@ -48,4 +48,22 @@ jacocoTestCoverageVerification {
         }
     }
 }
+
+task acceptanceTest(type: Test) {
+    description = 'Run acceptance tests'
+    group = 'verification'
+
+    // Inclure les dépendances nécessaires pour vos tests d'acceptation
+    classpath += configurations.acceptanceTestCompile
+
+    // Spécifier les classes de test d'acceptation
+    include '**/*AcceptanceTest.*'
+
+    // Paramètres supplémentaires si nécessaire
+    systemProperty 'calculator.url', 'http://localhost:8080'  // Remplacez l'URL par celle de votre application
+
+    // Autres configurations de test si nécessaire
+    useJUnitPlatform()
+}
+
 
