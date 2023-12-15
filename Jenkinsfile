@@ -41,7 +41,7 @@ pipeline {
             steps {
                sh 'docker stop calculator'
                sh 'docker rm calculator'
-                sh 'docker run -d --rm -p 8765:8080 --name calculator localhost:5000/calculator'
+                sh 'docker run -d -p 8765:8080 --name calculator localhost:5000/calculator'
             }
         }
         stage("Test d'acceptation") {
