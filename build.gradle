@@ -21,6 +21,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.7.0'
+    testImplementation 'io.cucumber:cucumber-java:7.14.1'
+    testImplementation 'io.cucumber:cucumber-junit:7.14.1'
 }
 
 tasks.named('test') {
@@ -49,12 +51,5 @@ jacocoTestCoverageVerification {
     }
 }
 
-task acceptanceTest(type: Test) {
-    description = 'Run acceptance tests'
-    group = 'verification'
-    
-    // Autres configurations de test si nécessaire
-    useJUnitPlatform()
-}
 
 
