@@ -24,15 +24,9 @@ spec:
       - name: calculator
         image: 192.168.59.101:5000/calculator:latest
         ports:
-        - containerPort: 8080
+        - containerPort: 8888
         readinessProbe:
           httpGet:
-             path: /sum?a=1&b=2
-             port: 8080
+            path: /sum?a=1&b=2
+            port: 8888
 
-
-        
-        
-
-        
-    
