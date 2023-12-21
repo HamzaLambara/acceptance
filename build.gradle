@@ -13,10 +13,6 @@ java {
     sourceCompatibility = '17'
 }
 
-repositories {
-    mavenCentral()
-}
-
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -51,7 +47,6 @@ jacocoTestCoverageVerification {
     }
 }
 
-// Ajouter les lignes suivantes pour configurer les tests d'acceptation
 repositories {
     mavenCentral()
 }
