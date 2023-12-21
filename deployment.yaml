@@ -5,7 +5,12 @@ metadata:
   labels:
     app: calculator
 spec:
-  replicas: 3
+  replicas: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 0
   selector:
     matchLabels:
       app: calculator
@@ -13,12 +18,19 @@ spec:
     metadata:
       labels:
         app: calculator
+        label: label
     spec:
       containers:
       - name: calculator
-        image: 192.168.49.1:5000/calculator:latest
+        image: 192.168.59.101:5000/calculator:latest
         ports:
-        - containerPort: 8080 
+        - containerPort: 8080
+        readinessProbe:
+          httpGet:
+             path: /sum?a=1&b=2
+             port: 8080
+
+
         
         
 
